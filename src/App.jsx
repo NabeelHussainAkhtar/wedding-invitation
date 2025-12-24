@@ -5,17 +5,15 @@ import { Play, Pause, RotateCcw, Volume2, VolumeX, Heart, ChevronRight, ChevronL
  * ANIMATED PORTRAIT VIDEO INVITATION
  * Theme: Elegant | Islamic | Gold & Floral
  * Aspect Ratio: 9:16 (Optimized for Mobile, Centered on Desktop)
- * Features: "Insta-Story" Tapping, Vocal Nasheed, "Live" Broadcast Feel
+ * Features: "Insta-Story" Tapping, Vocal Nasheed
  */
 
 const App = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentScene, setCurrentScene] = useState(-1); // -1 is Start Screen
   const [isMuted, setIsMuted] = useState(false);
-  const [floatingHearts, setFloatingHearts] = useState([]); // For "Live" reactions
   const audioRef = useRef(null);
   const timerRef = useRef(null);
-  const heartsTimerRef = useRef(null);
   const containerRef = useRef(null); // Ref for the main container
 
   // Scene Configuration based on Script
@@ -48,23 +46,6 @@ const App = () => {
     }
 
     return () => clearTimeout(timerRef.current);
-  }, [isPlaying, currentScene]);
-
-  // Handle "Live" Reactions (Simulated fake hearts from viewers)
-  useEffect(() => {
-    if (isPlaying && currentScene > -1) {
-        heartsTimerRef.current = setInterval(() => {
-            if (Math.random() > 0.6) { // 40% chance to spawn a heart every tick
-                const id = Date.now();
-                setFloatingHearts(prev => [...prev, { id, left: 70 + Math.random() * 20 }]); // Random position right side
-                // Cleanup heart after animation
-                setTimeout(() => {
-                    setFloatingHearts(prev => prev.filter(h => h.id !== id));
-                }, 3000);
-            }
-        }, 800);
-    }
-    return () => clearInterval(heartsTimerRef.current);
   }, [isPlaying, currentScene]);
 
   // Helper to trigger fullscreen
@@ -184,29 +165,6 @@ const App = () => {
                    }}
               />
            ))}
-        </div>
-
-        {/* --- LIVE BADGE & VIEWERS --- */}
-        {currentScene > -1 && isPlaying && (
-            <div className="absolute top-6 left-4 z-50 flex items-center gap-2 animate-fade-in">
-                <div className="bg-red-600 px-2 py-0.5 rounded text-[10px] font-bold text-white animate-pulse tracking-wider">LIVE</div>
-                <div className="bg-black/20 backdrop-blur-md px-2 py-0.5 rounded-md text-[10px] font-bold text-gray-700 flex items-center gap-1">
-                    <Eye size={12} className="text-gray-600" /> 1.2k
-                </div>
-            </div>
-        )}
-
-        {/* --- LIVE REACTIONS (Floating Hearts) --- */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-50">
-            {floatingHearts.map((h) => (
-                <div 
-                    key={h.id} 
-                    className="absolute bottom-20 text-red-500 animate-float-up-fade"
-                    style={{ left: `${h.left}%` }}
-                >
-                    <Heart size={24} fill="currentColor" />
-                </div>
-            ))}
         </div>
 
         {/* --- DECORATIVE CORNERS --- */}
