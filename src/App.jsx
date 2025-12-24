@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RotateCcw, Volume2, VolumeX, Heart, ChevronRight, ChevronLeft, Eye } from 'lucide-react';
+import { Play, Pause, RotateCcw, Volume2, VolumeX, Heart, ChevronRight, ChevronLeft, Eye, Maximize } from 'lucide-react';
 
 /**
  * ANIMATED PORTRAIT VIDEO INVITATION
@@ -16,6 +16,7 @@ const App = () => {
   const audioRef = useRef(null);
   const timerRef = useRef(null);
   const heartsTimerRef = useRef(null);
+  const containerRef = useRef(null); // Ref for the main container
 
   // Scene Configuration based on Script
   const scenes = [
@@ -66,11 +67,29 @@ const App = () => {
     return () => clearInterval(heartsTimerRef.current);
   }, [isPlaying, currentScene]);
 
+  // Helper to trigger fullscreen
+  const requestFullScreen = () => {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen().catch((err) => {
+        console.log(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+      });
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+      elem.msRequestFullscreen();
+    }
+  };
 
   // Audio & Playback Control
   const togglePlay = (e) => {
     e?.stopPropagation();
-    if (currentScene === -1) setCurrentScene(0);
+    
+    // Request fullscreen on first play click from start screen
+    if (currentScene === -1) {
+        requestFullScreen();
+        setCurrentScene(0);
+    }
     
     if (isPlaying) {
       setIsPlaying(false);
@@ -136,7 +155,7 @@ const App = () => {
   const ivoryBg = "bg-[#FFFFF0]"; 
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center font-serif overflow-hidden relative selection:bg-yellow-200">
+    <div ref={containerRef} className="min-h-screen bg-gray-900 flex items-center justify-center font-serif overflow-hidden relative selection:bg-yellow-200">
       {/* Background Ambience (Desktop) */}
       <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] pointer-events-none"></div>
 
